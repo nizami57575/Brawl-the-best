@@ -3,158 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brawl Stars Ultra Cyber Portal v3.5</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <title>Brawl Stars Nexus Portal v5.0</title>
     <style>
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff007f;
-            --bg-dark: #05050a;
-            --panel-bg: rgba(16, 20, 35, 0.85);
+            --neon-green: #39ff14;
+            --bg-dark: #060713;
+            --panel-bg: rgba(13, 17, 39, 0.75);
             --gold: #ffd700;
         }
         body, html {
             margin: 0; padding: 0; width: 100%; min-height: 100vh;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Courier New', Courier, monospace, sans-serif;
             background-color: var(--bg-dark); color: #fff;
-            overflow-x: hidden;
+            overflow-x: hidden; scrollbar-width: thin;
         }
-        /* Matrix Canlı Arka Planı */
-        #bg-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-        }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        
+        /* Canlı Xəbər Xətti */
+        .news-ticker { background: linear-gradient(90deg, #ff007f, #00f3ff); padding: 5px 0; font-size: 11px; font-weight: bold; text-transform: uppercase; overflow: hidden; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,243,255,0.3); }
+        .news-ticker span { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
         .portal-wrapper {
-            width: 92%; max-width: 680px; margin: 30px auto;
+            width: 94%; max-width: 800px; margin: 20px auto;
             background: var(--panel-bg); border: 2px solid var(--neon-blue);
-            border-radius: 24px; padding: 25px;
-            backdrop-filter: blur(12px); box-shadow: 0 0 35px rgba(0, 243, 255, 0.25);
+            border-radius: 20px; padding: 25px;
+            backdrop-filter: blur(15px); box-shadow: 0 0 40px rgba(0, 243, 255, 0.3);
         }
-        .sc-container {
-            background: #ffffff; color: #000000; padding: 25px; border-radius: 18px;
-            text-align: center; border: 4px solid #0085ff; margin-bottom: 20px;
-        }
-        .sc-input {
-            width: 85%; padding: 12px; margin: 12px 0; border-radius: 30px;
-            border: 2px solid #bbb; font-size: 16px; text-align: center; outline: none;
-        }
-        .sc-btn {
-            background: #0085ff; color: white; padding: 12px 40px;
-            border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px;
-        }
-        .hidden { display: none !important; }
         .cyber-card {
-            background: rgba(25, 30, 55, 0.7); padding: 18px; border-radius: 14px;
-            margin-bottom: 15px; border: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(8, 12, 28, 0.8); padding: 18px; border-radius: 12px;
+            margin-bottom: 15px; border: 1px solid rgba(0, 243, 255, 0.15);
+            box-shadow: inset 0 0 10px rgba(0,243,255,0.05); transition: 0.3s;
         }
+        .cyber-card:hover { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255,0,127,0.15); }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media(max-width: 650px) { .grid-2 { grid-template-columns: 1fr; } }
+        
         .chat-box {
-            background: #080912; height: 140px; overflow-y: auto;
-            padding: 12px; border-radius: 10px; font-size: 13px; margin-bottom: 10px; border: 1px solid #1f2544;
+            background: #04060f; height: 150px; overflow-y: auto;
+            padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border: 1px solid #141b36;
         }
         .glow-btn {
             background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
-            color: white; border: none; padding: 12px; border-radius: 10px;
+            color: white; border: none; padding: 12px; border-radius: 8px;
             font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); transition: 0.2s; font-family: sans-serif;
         }
-        .glow-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
-        #perf-monitor { position: fixed; top: 10px; left: 10px; font-family: monospace; font-size: 11px; color: var(--neon-blue); background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; z-index: 9999; }
-        button.avatar-select { background: #1f2544; color: white; border: 1px solid var(--neon-blue); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-        button.avatar-select:hover { background: var(--neon-blue); color: black; }
+        .glow-btn:hover { transform: translateY(-2px); filter: brightness(1.2); box-shadow: 0 0 25px rgba(0, 243, 255, 0.6); }
+        #perf-monitor { position: fixed; top: 35px; left: 10px; font-family: monospace; font-size: 11px; color: var(--neon-blue); background: rgba(0,0,0,0.7); padding: 6px; border-radius: 4px; z-index: 9999; border: 1px solid var(--neon-blue); }
+        
+        /* Pin emojiləri */
+        .pin-box span { font-size: 24px; cursor: pointer; transition: 0.2s; display: inline-block; padding: 5px; }
+        .pin-box span:hover { transform: scale(1.3) rotate(10deg); filter: drop-shadow(0 0 5px var(--neon-blue)); }
+        
+        #sales-popup { position: fixed; bottom: 20px; left: 20px; background: rgba(5,8,22,0.95); border-left: 5px solid var(--neon-green); padding: 12px 20px; border-radius: 6px; box-shadow: 0 0 20px rgba(0,0,0,0.6); font-size: 12px; z-index: 99999; display: none; border: 1px solid rgba(57,255,20,0.2); }
+        .sync-light { width: 8px; height: 8px; background-color: var(--neon-green); border-radius: 50%; display: inline-block; box-shadow: 0 0 8px var(--neon-green); animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div id="perf-monitor">FPS: 60 | PING: <span id="fps-ping">31</span>ms</div>
+<div class="news-ticker">
+    <span>🔥 MÖVSÜM YENİLƏNDİ! // YENİ KİBER SKINLƏR MAĞAZAYA ƏLAVƏ EDİLDİ // PROMO KOD: BS2026 // SON TURNİR QALİBİ: NİZAMİ CƏFƏRLİ! 🎉</span>
+</div>
+
+<div id="perf-monitor">FPS: 60 | PING: <span id="fps-ping">24</span>ms | SYSTEM: <span id="sync-status"><span class="sync-light"></span> CLOUD SYNCED</span></div>
 <canvas id="bg-canvas"></canvas>
 
+<div id="sales-popup">🌐 <span id="sales-text"></span></div>
+
 <div class="portal-wrapper">
-
-    <div id="login-part">
-        <div class="sc-container">
-            <h2 style="color: #0085ff; margin: 0 0 10px 0; font-family: sans-serif; font-weight: 900;">SUPERCELL ID</h2>
-            <p style="font-weight: bold; color: #333; margin: 5px 0;">Oyun Hesabınızı Portalımıza Bağlayın</p>
-            <p style="font-size: 13px; color: #666;">Doğrulama kodunun gəlməsi üçün aktiv Supercell ID mailinizi yazın:</p>
-            <input type="email" id="email-input" class="sc-input" placeholder="brawlstars@gmail.com">
-            <br>
-            <button class="sc-btn" onclick="sendRealOtp()">KODU GÖNDƏR</button>
-        </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(0,243,255,0.2); padding-bottom: 10px;">
+        <h2 style="color: var(--neon-blue); margin: 0; text-shadow: 0 0 15px var(--neon-blue); font-size: 24px;">🧬 NEXUS BRAWL PORTAL v5.0</h2>
+        <select id="theme-selector" onchange="changeTheme()" style="background:#0a0d24; color:#fff; border:1px solid var(--neon-pink); padding:6px; border-radius:6px; cursor:pointer;">
+            <option value="blue">Neon Mavi</option>
+            <option value="pink">Kiber Çəhrayı</option>
+            <option value="green">Matris Yaşıl</option>
+            <option value="gold">Qızılı Kiber</option>
+        </select>
     </div>
 
-    <div id="otp-part" class="hidden">
-        <div class="sc-container">
-            <h2 style="color: #0085ff; margin: 0 0 10px 0; font-weight: 900;">Kodu Daxil Edin</h2>
-            <p style="font-size: 13px; color: #555;">Gmail-inizə gələn 6 rəqəmli təhlükəsizlik kodunu bura daxil edin:</p>
-            <input type="text" id="otp-input" class="sc-input" placeholder="******" maxlength="6">
-            <br>
-            <button class="sc-btn" style="background: #22c55e;" onclick="checkOtp()">DAXİL OL</button>
-        </div>
-    </div>
-
-    <div id="portal-part" class="hidden">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="color: var(--neon-blue); margin: 0; text-shadow: 0 0 10px var(--neon-blue);">🌌 Cyber Brawl Hub Pro</h3>
-            <span style="color: var(--neon-pink); font-size: 13px; font-weight: bold;">🔴 Canlı: <span id="online-count">560</span></span>
-        </div>
-
-        <div class="cyber-card">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div id="avatar-display" style="font-size: 35px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 50%;">🌵</div>
-                <div style="flex: 1;">
-                    <h4 style="margin: 0;" id="user-title">Rank: Bürünc Oyunçu</h4>
-                    <p style="margin: 4px 0; font-size: 13px; color: var(--gold);">Hesab Kupası: <span id="trophy-count">0</span> 🏆</p>
-                    <div style="background: #222; width: 100%; height: 8px; border-radius: 5px; margin-top: 5px; overflow: hidden;">
-                        <div id="xp-progress" style="background: var(--neon-blue); width: 0%; height: 100%; transition: 0.4s;"></div>
-                    </div>
+    <div class="cyber-card" id="profile-card-zone">
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div id="avatar-display" style="font-size: 40px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 50%; border: 2px solid var(--neon-blue);">🌵</div>
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="margin: 0; color:#fff; font-size: 18px;" id="user-title">Rank: Bürünc Oyunçu</h4>
+                <p style="margin: 5px 0; font-size: 13px; color: var(--gold);">Kupa: <span id="trophy-count">0</span> 🏆 | Səviyyə: <span id="lvl-display">1</span> <span id="rank-badge" style="color:var(--neon-blue)">(RÜTBƏ: ROOKIE)</span></p>
+                <div style="background: #111; width: 100%; height: 10px; border-radius: 5px; margin-top: 6px; overflow: hidden; border: 1px solid #333;">
+                    <div id="xp-progress" style="background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink)); width: 0%; height: 100%; transition: 0.4s;"></div>
+                </div>
+                <p style="margin: 6px 0 0 0; font-size: 11px; color:#aaa;">Klik Enerjisi: <span id="energy-text">100</span>/100</p>
+                <div style="background: #111; width: 100%; height: 6px; border-radius: 5px; margin-top: 4px; overflow: hidden;">
+                    <div id="energy-bar" style="background: var(--neon-green); width: 100%; height: 100%; transition: 0.2s;"></div>
                 </div>
             </div>
-            <div style="margin-top: 12px; display: flex; gap: 6px;">
-                <button class="avatar-select" onclick="changeAvatar('🌵')">Spike</button>
-                <button class="avatar-select" onclick="changeAvatar('💀')">Poco</button>
-                <button class="avatar-select" onclick="changeAvatar('🐈')">Kit</button>
-                <button class="avatar-select" onclick="changeAvatar('🦅')">Bo</button>
-            </div>
         </div>
-
-        <div class="grid-2">
-            <div class="cyber-card" style="text-align: center;">
-                <h5>🏆 Kupa Generatoru</h5>
-                <button class="glow-btn" onclick="addTrophies()">Kliklə (+5 🏆)</button>
-            </div>
-            <div class="cyber-card" style="text-align: center;">
-                <h5>🎁 Gündəlik Starr Drop</h5>
-                <button class="glow-btn" style="background: var(--gold); color:#000;" id="drop-btn" onclick="openStarrDrop()">AÇ 📦</button>
-                <p id="drop-res" style="font-size: 12px; margin-top: 6px; font-weight: bold; color: var(--neon-blue);"></p>
-            </div>
-        </div>
-
-        <div class="cyber-card">
-            <h5 style="margin-top: 0; color: var(--neon-blue);">💬 Qlobal Canlı Söhbət</h5>
-            <div class="chat-box" id="chat-screen"></div>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="chat-nick" placeholder="Ad" style="width: 20%; background: #000; color: #fff; border: 1px solid #333; padding: 7px; border-radius: 6px;">
-                <select id="nick-color" style="background: #000; color: #fff; border: 1px solid #333; border-radius: 6px; padding: 7px;">
-                    <option value="#00f3ff">Mavi</option>
-                    <option value="#ff007f">Çəhrayı</option>
-                    <option value="#ffd700">Qızılı</option>
-                </select>
-                <input type="text" id="chat-text" placeholder="Mesaj yazın..." style="width: 55%; background: #000; color: #fff; border: 1px solid #333; padding: 7px; border-radius: 6px;">
-                <button onclick="sendMsg()" style="width: 15%; background: var(--neon-blue); color: black; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">Göndər</button>
-            </div>
-        </div>
-
-        <div class="cyber-card">
-            <h5 style="margin-top: 0; color: var(--gold);">💎 Elmas və Paket Sifarişi</h5>
-            <select id="gem-pack" style="width: 100%; padding: 10px; background: #000; color: white; border: 1px solid var(--neon-blue); border-radius: 8px;">
-                <option value="80">80 Elmas - 2.99 AZN</option>
-                <option value="360">360 Elmas - 11.99 AZN</option>
-                <option value="950">950 Elmas - 29.99 AZN</option>
-            </select>
-            <button class="glow-btn" style="margin-top: 12px;" onclick="processOrder()">SİFARİŞİ GÖNDƏR</button>
-        </div>
-
     </div>
+
+    <div class="grid-2">
+        <div class="cyber-card" style="text-align: center;">
+            <h5>🏆 KUPA GENERATORU</h5>
+            <button class="glow-btn" onclick="addTrophies()">KLİKLƏ (+5 🏆)</button>
+        </div>
+        <div class="cyber-card">
+            <h5>🎵 KİBER FON MUSİQİSİ</h5>
+            <select id="track-select" style="width: 100%; padding: 8px; background:#000; color:#fff; border:1px solid #333; border-radius:6px; margin-bottom:8px;">
+                <option value="1">Cyberpunk Melodiya v1</option>
+                <option value="2">Brawl Stars Remix Beat</option>
+                <option value="3">Lo-Fi Cyber Chillout</option>
+            </select>
+            <div style="display:flex; gap:5px; align-items:center;">
+                <button onclick="alert('Musiqi aktiv edildi!')" style="flex:1; padding:5px;">Oynat ▶️</button>
+                <input type="range" id="volume-slider" min="0" max="100" value="70" style="width:50%;">
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="cyber-card" style="text-align: center;">
+            <h5>⏱️ REAKSİYA SÜRƏT TESTİ</h5>
+            <button id="speed-game-btn" onclick="startSpeedGame()" style="background:#1f2544; color:#fff; border:1px solid var(--neon-blue); padding:8px; border-radius:6px; width:100%; cursor:pointer; font-weight:bold;">OYUNU BAŞLAT 🎮</button>
+            <p id="speed-game-res" style="font-size:12px; margin-top:5px; color:var(--neon-green); font-weight:bold;"></p>
+        </div>
+        <div class="cyber-card" style="text-align: center;">
+            <h5>🎡 NEXUS ŞANS ÇARXI</h5>
+            <button class="glow-btn" style="background: linear-gradient(45deg, var(--gold), #ff5500);" onclick="spinWheel()">ÇARXI FIRLAT 🌀</button>
+            <p id="wheel-res" style="font-size: 12px; margin-top: 6px; font-weight: bold; color: var(--neon-blue);"></p>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="cyber-card">
+            <h5>🧠 BRAWL QUIZ PRO (Can: <span id="quiz-hp" style="color:red; font-weight:bold;">3</span>)</h5>
+            <p id="quiz-question" style="font-size:12px; color:#ccc; min-height:35px;"></p>
+            <div style="display:flex; gap:5px;">
+                <button onclick="answerQuiz(true)" style="width:50%; background:#22c55e; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer; font-weight:bold;">DÜZDÜR</button>
+                <button onclick="answerQuiz(false)" style="width:50%; background:#ef4444; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer; font-weight:bold;">SƏHVDİR</button>
+            </div>
+        </div>
+        <div class="cyber-card">
+            <h5>🔍 HANSI BRAWLER-SƏN?</h5>
+            <select id="test-style" onchange="runBrawlerTest()" style="width:100%; padding:8px; background:#000; color:#fff; border:1px solid #333; border-radius:6px;">
+                <option value="">Oyun tərzini seç...</option>
+                <option value="aggro">Aqressiv və Sürətli (Rush)</option>
+                <option value="camper">Pusqu və Gizlilik (Tactical)</option>
+                <option value="support">Dostlara Kömək və Müalicə (Heal)</option>
+            </select>
+            <p id="test-res" style="font-size:12px; margin-top:8px; font-weight:bold; color:var(--neon-pink);"></p>
+        </div>
+    </div>
+
+    <div class="cyber-card">
+        <h5 style="margin-top: 0; color: var(--neon-blue);">💬 QLOBAL KİBER SÖHBƏT</h5>
+        <div class="chat-box" id="chat-screen"></div>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+            <input type="text" id="chat-nick" placeholder="Ləqəb" style="width: 20%; background: #000; color: #fff; border: 1px solid #333; padding: 8px; border-radius: 6px;">
+            <select id="nick-color" style="background: #000; color: #fff; border: 1px solid #333; border-radius: 6px; padding: 8px;">
+                <option value="#00f3ff">Mavi</option>
+                <option value="#ff007f">Çəhrayı</option>
+                <option value="#ffd700">Qızılı</option>
+                <option value="#39ff14">Yaşıl</option>
+            </select>
+            <input type="text" id="chat-text" placeholder="Mesajınızı bura daxil edin..." style="flex:1; background: #000; color: #fff; border: 1px solid #333; padding: 8px; border-radius: 6px; min-width: 150px;">
+            <button onclick="sendMsg()" style="background: var(--neon-blue); color: black; font-weight: bold; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer;">GÖNDƏR</button>
+        </div>
+    </div>
+
+    <div class="cyber-card">
+        <h5 style="margin-top:0; color:var(--neon-blue);">🎭 BRAWLER PIN KOLLEKSİYASI & SƏSLƏR</h5>
+        <div class="pin-box" style="text-align: center;">
+            <span onclick="triggerPinSound('Leon', 'In the lead!')">🥷 (Leon)</span>
+            <span onclick="triggerPinSound('Crow', 'Don\'t mess with my crew!')">🦅 (Crow)</span>
+            <span onclick="triggerPinSound('Mortis', 'Bring on the doom!')">🧛 (Mortis)</span>
+            <span onclick="triggerPinSound('Edgar', 'Great, now everyone hates me.')">🧣 (Edgar)</span>
+        </div>
+        <p id="pin-sound-text" style="font-size:12px; text-align:center; color:var(--neon-pink); margin-top:5px; font-weight:bold;"></p>
+    </div>
+
+    <div class="grid-2">
+        <div class="cyber-card">
+            <h5 style="margin-top:0; color:var(--gold);">🛍️ KİBER SKIN MAĞAZASI</h5>
+            <div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; margin:4px 0; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                <span>Mecha Mortis</span><button onclick="buySkin('Mecha Mortis', 50)" style="background:var(--neon-pink); color:white; border:none; padding:3px 6px; border-radius:4px; cursor:pointer;">50 🏆</button>
+            </div>
+            <div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; margin:4px 0; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                <span>Phoenix Crow</span><button onclick="buySkin('Phoenix Crow', 150)" style="background:var(--neon-pink); color:white; border:none; padding:3px 6px; border-radius:4px; cursor:pointer;">150 🏆</button>
+            </div>
+            <div style="font-size:12px; background:rgba(0,0,0,0.3); padding:6px; margin:4px 0; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                <span>Challenger Colt</span><button onclick="buySkin('Challenger Colt', 300)" style="background:var(--neon-pink); color:white; border:none; padding:3px 6px; border-radius:4px; cursor:pointer;">300 🏆</button>
+            </div>
+        </div>
+        <div class="cyber-card">
+            <h5>⚔️ BRAWLER MÜQAYİSƏ SİSTEMİ</h5>
+            <div style="display:flex; gap:5px; margin-bottom:6px;">
+                <select id="comp-1" style="width:50%; background:#000; color:#fff; border:1px solid #333;"><option value="Leon">Leon</option><option value="El Primo">El Primo</option></select>
+                <select id="comp-2" style="width:50%; background:#000; color:#fff; border:1px solid #333;"><option value="Crow">Crow</option><option value="Shelly">Shelly</option></select>
+            </div>
+            <button onclick="compareBrawlers()" style="width:100%; font-size:11px; padding:6px; background:#1f2544; color:#fff; border:1px solid var(--neon-blue); border-radius:4px; cursor:pointer;">MÜQAYİSƏ ET</button>
+            <p id="compare-res" style="font-size:11px; margin-top:6px; color:#aaa;"></p>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="cyber-card">
+            <h5>📊 KLAN KUPA KALKULYATORU</h5>
+            <input type="number" id="member-count" placeholder="Üzv (Maks 50)" style="width:90%; padding:5px; background:#000; color:#fff; border:1px solid #333; border-radius:4px; margin-bottom:4px;">
+            <input type="number" id="avg-trophy" placeholder="Ortalama Kupa" style="width:90%; padding:5px; background:#000; color:#fff; border:1px solid #333; border-radius:4px;">
+            <button onclick="calcClubTrophies()" style="width:95%; font-size:11px; margin-top:6px; padding:5px; background:#1f2544; color:white; border:1px solid var(--neon-blue); border-radius:4px; cursor:pointer;">HESABLA</button>
+            <p id="club-calc-res" style="font-size:11px; margin-top:5px; color:var(--neon-blue);"></p>
+        </div>
+        <div class="cyber-card">
+            <h5>🛡️ KLAN TEQ YADDAŞI</h5>
+            <input type="text" id="club-tag-input" placeholder="#CLUBTAG" style="width:90%; padding:5px; background:#000; color:#fff; border:1px solid #333; border-radius:4px;">
+            <button onclick="saveClubTag()" style="width:95%; font-size:11px; margin-top:5px; padding:5px; background:#1f2544; color:white; border:1px solid var(--neon-pink); border-radius:4px; cursor:pointer;">YADDAŞA YAZ</button>
+            <p id="club-tag-res" style="font-size:11px; margin-top:5px; color:var(--neon-pink);"></p>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="cyber-card">
+            <h5 style="color:var(--neon-blue); margin-top:0;">🏆 AKTİV TURNİRLƏR & LİDERLƏR</h5>
+            <div style="font-size:11px; color:#ccc;">
+                <p style="margin:2px 0;">1. <b>Nizami</b> - 75,500 🏆</p>
+                <p style="margin:2px 0;">2. <b>Kiber_King</b> - 71,200 🏆</p>
+                <hr style="border-color:#222;">
+                <p style="margin:2px 0; color:var(--neon-green);">● Cyber Cup 2026: Aktivdir</p>
+            </div>
+        </div>
+        <div class="cyber-card">
+            <h5 style="color:var(--neon-pink); margin-top:0;">📡 LEAKS (SIZDIRILMIŞ MƏLUMATLAR)</h5>
+            <p style="font-size:11px; color:#aaa; margin:0;">Gələn ay oyuna 2 yeni Kiber-Xarakter və Matrix oyun rejimi əlavə olunacağı gözlənilir!</p>
+            <button onclick="checkPing()" style="margin-top:8px; font-size:10px; padding:3px 6px;">Ping Testi Et</button>
+            <span id="ping-test-res" style="font-size:11px; color:var(--neon-blue); margin-left:5px;"></span>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="cyber-card">
+            <h5>🎟️ PROMO KOD AKTİVLƏŞDİR</h5>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="promo-input" placeholder="KODU YAZIN" style="width:70%; background:#000; color:#fff; border:1px solid #333; padding:5px; border-radius:4px;">
+                <button onclick="activatePromo()" style="width:30%; font-size:11px; cursor:pointer;">Yoxla</button>
+            </div>
+        </div>
+        <div class="cyber-card" style="text-align:center;">
+            <h5>⚙️ SİSTEM AYARLARI</h5>
+            <button onclick="resetAllData()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-size:11px; font-weight:bold;">SAYT DATASINI SIFIRLA 🛑</button>
+        </div>
+    </div>
+
+    <div class="cyber-card">
+        <h5 style="margin-top: 0; color: var(--gold);">💎 ELMAS VƏ PAKET SİFARİŞ SİSTEMİ</h5>
+        <select id="gem-pack" style="width: 100%; padding: 10px; background: #000; color: white; border: 1px solid var(--neon-blue); border-radius: 8px;">
+            <option value="80">80 Elmas - 2.99 AZN</option>
+            <option value="360">360 Elmas - 11.99 AZN</option>
+            <option value="950">950 Elmas - 29.99 AZN</option>
+        </select>
+        <button class="glow-btn" style="margin-top: 12px;" onclick="processOrder()">SİFARİŞİ SİSTEMƏ GÖNDƏR</button>
+    </div>
+
 </div>
 
 <script src="script.js"></script>
