@@ -1,1 +1,289 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars Ultra Oyunçu Paneli</title>
+    <style>
+        :root {
+            --bg-color: #0c0f1d;
+            --panel-bg: #161b33;
+            --accent-neon: #00ffcc;
+            --supercell-blue: #0085ff;
+            --text-color: #ffffff;
+            --gold: #ffd700;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .main-container {
+            background-color: var(--panel-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.2);
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid var(--accent-neon);
+        }
+        .sc-login-box {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid var(--supercell-blue);
+        }
+        .sc-input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 25px;
+            border: 2px solid #ccc;
+            font-size: 16px;
+            text-align: center;
+        }
+        .sc-btn {
+            background-color: var(--supercell-blue);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .hidden { display: none; }
+        
+        /* Grid sistemləri */
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        
+        .brawler-card {
+            background: #222a4a;
+            border: 1px solid var(--accent-neon);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .btn-premium {
+            background: linear-gradient(45deg, #ff007f, #7928ca);
+            color: white; border: none; padding: 12px;
+            border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer;
+        }
+        .chat-area {
+            background: #0d1124; height: 120px; overflow-y: auto;
+            padding: 10px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+
+    <div id="sc-auth-screen">
+        <div class="sc-login-box">
+            <h2 style="color: var(--supercell-blue); margin-top: 0;">SUPERCELL ID</h2>
+            <p style="font-weight: bold; color: #555;">Oyun Hesabınızı Sayta Bağlayın</p>
+            <p style="font-size: 13px; color: #666;">Təhlükəsizlik və bot önləmi üçün Supercell ID mailinizi daxil edin:</p>
+            <input type="email" id="sc-email" class="sc-input" placeholder="example@gmail.com" required>
+            <br>
+            <button class="sc-btn" onclick="sendScCode()">İrəli</button>
+        </div>
+    </div>
+
+    <div id="sc-code-screen" class="hidden">
+        <div class="sc-login-box">
+            <h2 style="color: var(--supercell-blue);">Kodu Daxil Edin</h2>
+            <p style="font-size: 14px; color: #333;">Mailinizə gələn 6 rəqəmli təsdiq kodunu yazın:</p>
+            <input type="text" id="sc-code" class="sc-input" placeholder="******" maxlength="6">
+            <br>
+            <button class="sc-btn" style="background-color: #22c55e;" onclick="verifyScCode()">Girişi Tamamla</button>
+        </div>
+    </div>
+
+    <div id="dashboard-screen" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="color: var(--accent-neon); margin: 0;">🎮 Brawl Pro Dashboard</h3>
+            <span id="live-timer" style="color: var(--gold); font-size: 13px;">Sezon Sonu: 12g 04s</span>
+        </div>
+        <hr style="border-color: #222a4a; margin: 15px 0;">
+
+        <div class="brawler-card" style="text-align: left; margin-bottom: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: var(--gold);">🔍 Oyunçu Profili Yoxla (API Simulyatoru)</h4>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="player-tag" placeholder="#PLAYER_TAG" style="background: #0d1124; color: white; border: 1px solid var(--accent-neon); padding: 8px; border-radius: 5px; flex: 1;">
+                <button onclick="checkPlayerTag()" style="background: var(--accent-neon); color: black; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">Axtar</button>
+            </div>
+            <div id="player-status" style="margin-top: 10px; font-size: 13px; display: none;">
+                <p style="margin: 3px 0;">Ad: <strong id="p-name">Nizami_Pro</strong> | Kupalar: <strong style="color: var(--gold);" id="p-trophy">34,500 🏆</strong></p>
+                <p style="margin: 3px 0;">Ən Yüksək Mod: <strong>3v3 Master</strong></p>
+            </div>
+        </div>
+
+        <h4>🔥 Günün Ən Güclü Xarakterləri (Meta)</h4>
+        <div class="grid-3">
+            <div class="brawler-card">
+                <span style="color: #ff4500; font-size: 12px; font-weight: bold;">S-TIER</span>
+                <h5>Shelly</h5>
+                <p style="font-size: 11px; color: #40ff40;">Buff +5% HP</p>
+            </div>
+            <div class="brawler-card">
+                <span style="color: #ff4500; font-size: 12px; font-weight: bold;">S-TIER</span>
+                <h5>Edgar</h5>
+                <p style="font-size: 11px; color: white;">Stabil</p>
+            </div>
+            <div class="brawler-card">
+                <span style="color: #ffaa00; font-size: 12px; font-weight: bold;">A-TIER</span>
+                <h5>Colt</h5>
+                <p style="font-size: 11px; color: #ff4040;">Nerf -2% Dmg</p>
+            </div>
+        </div>
+
+        <div class="brawler-card" style="text-align: left; margin-bottom: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: var(--accent-neon);">💬 Qlobal Oyunçu Söhbəti</h4>
+            <div class="chat-area" id="global-chat"></div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="msg-user" placeholder="Adınız" style="width: 30%; background:#0d1124; color:white; border:1px solid #334155; padding:5px; border-radius:5px;">
+                <input type="text" id="msg-text" placeholder="Mesaj yazın..." style="width: 50%; background:#0d1124; color:white; border:1px solid #334155; padding:5px; border-radius:5px;">
+                <button onclick="sendGlobalMsg()" style="width: 20%; background: var(--supercell-blue); color:white; border:none; border-radius:5px; cursor:pointer;">Göndər</button>
+            </div>
+        </div>
+
+        <div class="brawler-card" style="margin-bottom: 15px;">
+            <h4>🎁 Gündəlik Ödənişsiz Mega Qutu</h4>
+            <button id="box-btn" onclick="openMegaBox()" style="background: #eab308; color: black; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer;">Qutunu Aç 📦</button>
+            <p id="box-result" style="margin-top: 10px; color: var(--accent-neon); font-weight: bold;"></p>
+        </div>
+
+        <div class="grid-2">
+            <div class="brawler-card">
+                <h5>🔑 Promo Kod Yoxla</h5>
+                <input type="text" id="promo-code" placeholder="BRAWL2026" style="width:90%; background:#0d1124; color:white; border:1px solid #555; padding:5px; border-radius:5px; text-align:center;">
+                <button onclick="applyPromo()" style="margin-top:5px; width:95%; background:#22c55e; border:none; padding:5px; color:white; border-radius:5px; cursor:pointer;">Aktivləşdir</button>
+            </div>
+            <div class="brawler-card">
+                <h5>⚡ İnternet Ping Testi</h5>
+                <button onclick="runPingTest()" style="background:#475569; color:white; border:none; padding:8px; width:95%; border-radius:5px; cursor:pointer;">Gecikməni Ölç</button>
+                <p id="ping-res" style="margin: 5px 0 0 0; font-size:13px; color: var(--accent-neon);">- ms</p>
+            </div>
+        </div>
+
+        <div class="brawler-card">
+            <h4 style="color: var(--gold);">💎 Premium Elmas Paketləri (Sifarişli)</h4>
+            <select id="gem-package" style="width: 100%; padding: 10px; background: #0d1124; color: white; border: 1px solid var(--accent-neon); border-radius: 5px;">
+                <option value="2.99">80 Elmas - 2.99 AZN</option>
+                <option value="11.99">360 Elmas - 11.99 AZN</option>
+                <option value="29.99">950 Elmas - 29.99 AZN</option>
+                <option value="59.99">2000 Elmas - 59.99 AZN</option>
+            </select>
+            <p style="font-size: 12px; color: #aaa; margin: 8px 0;">*Ödəniş təsdiqləndikdən sonra yükləmə manual olaraq həyata keçirilir.</p>
+            <button class="btn-premium" onclick="completePurchase()">SİFARİŞİ TAMAMLA</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let scGeneratedCode = null;
+
+    // 1. Supercell ID Kod göndərmə
+    function sendScCode() {
+        const email = document.getElementById('sc-email').value;
+        if (!email.includes('@') || email.length < 6) {
+            alert("Xahiş olunur düzgün Supercell ID maili daxil edin.");
+            return;
+        }
+        scGeneratedCode = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log(`[Supercell ID Təhlükəsizlik Sistemi] Kod: ${scGeneratedCode}`);
+        alert("6 rəqəmli giriş kodu mailinizə göndərildi! (Yoxlamaq üçün brauzerin konsol pəncərəsinə baxın)");
+        
+        document.getElementById('sc-auth-screen').classList.add('hidden');
+        document.getElementById('sc-code-screen').classList.remove('hidden');
+    }
+
+    // 2. Supercell ID Kod yoxlama
+    function verifyScCode() {
+        const codeInput = document.getElementById('sc-code').value;
+        if (codeInput === scGeneratedCode) {
+            alert("Giriş uğurludur! Panel yüklənir...");
+            document.getElementById('sc-code-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+            loadDefaultChat();
+        } else {
+            alert("Daxil edilən kod səhvdir. Yenidən yoxlayın.");
+        }
+    }
+
+    // 3. Oyunçu Profili Axtarış
+    function checkPlayerTag() {
+        const tag = document.getElementById('player-tag').value;
+        if(tag.length < 4) { alert("Düzgün Tag yazın!"); return; }
+        document.getElementById('player-status').style.display = "block";
+    }
+
+    // 4. Söhbət Otağı Funksiyaları
+    function loadDefaultChat() {
+        const box = document.getElementById('global-chat');
+        box.innerHTML = `
+            <p style="margin:4px 0; font-size:13px;"><strong style="color:var(--accent-neon);">[Admin]:</strong> Xoş gəldiniz! Söhbət paneli aktivdir.</p>
+            <p style="margin:4px 0; font-size:13px;"><strong>Samir_BS:</strong> Kimdə 360 elmas kodu var?</p>
+        `;
+    }
+    function sendGlobalMsg() {
+        const user = document.getElementById('msg-user').value || "Oyunçu";
+        const text = document.getElementById('msg-text').value;
+        if(!text) return;
+        const box = document.getElementById('global-chat');
+        box.innerHTML += `<p style="margin:4px 0; font-size:13px;"><strong>${user}:</strong> ${text}</p>`;
+        document.getElementById('msg-text').value = "";
+        box.scrollTop = box.scrollHeight;
+    }
+
+    // 5. Mega Qutu Açma
+    function openMegaBox() {
+        const res = document.getElementById('box-result');
+        res.innerText = "Qutu açılır... 🎲";
+        setTimeout(() => {
+            const rewards = ["⭐ 3 Bling + 200 Qızıl", "💥 Nita (Xarakter)!", "💎 10 Müvəqqəti Elmas", "🎫 Brawl Pass 50 XP Boost"];
+            res.innerText = "Çıxan Hədiyyə: " + rewards[Math.floor(Math.random() * rewards.length)];
+        }, 1500);
+    }
+
+    // 6. Promo Kod
+    function applyPromo() {
+        const code = document.getElementById('promo-code').value;
+        if(code.toUpperCase() === "BRAWL2026") {
+            alert("Təbriklər! 500 Sayt Xalı qazandınız.");
+        } else {
+            alert("Keçərsiz və ya müddəti bitmiş kod.");
+        }
+    }
+
+    // 7. Ping Testi
+    function runPingTest() {
+        const res = document.getElementById('ping-res');
+        res.innerText = "Yoxlanır...";
+        setTimeout(() => {
+            const randomPing = Math.floor(25 + Math.random() * 80);
+            res.innerText = randomPing + " ms (Əla)";
+        }, 1000);
+    }
+
+    // 8. Satınalma
+    function completePurchase() {
+        const price = document.getElementById('gem-package').value;
+        alert(`Sifariş yaradıldı! Qiymət: ${price} AZN. Ödəniş və təsdiq pəncərəsinə yönləndirilirsiniz.`);
+    }
+</script>
+
+</body>
+</html>
 
