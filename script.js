@@ -1,259 +1,173 @@
 // ==========================================================================
-// BRAWL STARS PRO PORTAL - PREMIUM JAVASCRIPT LOGIC
+// CYBER BRAWL STARS PORTAL - CORE JAVASCRIPT SYSTEM
 // ==========================================================================
 
-// --- Qlobal Dəyişənlər və Yaddaş Sistemi ---
-let trophies = parseInt(localStorage.getItem('portal_trophies')) || 0;
-let userXP = parseInt(localStorage.getItem('portal_xp')) || 0;
-let userLevel = parseInt(localStorage.getItem('portal_level')) || 1;
+// EmailJS Aktivləşdirmə Paneli
+(function() {
+    // BURANI DƏYİŞMƏ: Sənin şəxsi Public Key-ini bura yazmalısan
+    emailjs.init("YOUR_PUBLIC_KEY"); 
+})();
+
+let trophies = parseInt(localStorage.getItem('cyber_trophies')) || 0;
+let xp = parseInt(localStorage.getItem('cyber_xp')) || 0;
+let level = parseInt(localStorage.getItem('cyber_lvl')) || 1;
 let generatedOtp = null;
 
-// Sayt açılanda məlumatları ekrana yüklə
 window.onload = function() {
+    initMatrixBg();
     updateUI();
     setupChat();
-    startViewersCounter();
-    startSeasonTimer();
+    startMonitorSim();
 };
 
-// --- 1. İnterfeys Yeniləmə Funksiyası ---
-function updateUI() {
-    document.getElementById('trophy-count').innerText = trophies;
-    
-    // Rütbə təyin edilməsi
-    let title = "Bürünc Oyunçu 🥉";
-    if (trophies >= 100 && trophies < 300) title = "Qızıl Üzv ✨ 🥇";
-    if (trophies >= 300) title = "Elmas Master 🔥 💎";
-    
-    document.getElementById('user-title').innerText = "Rank: " + title;
+// --- 1. MÜKƏMMƏL MATRİX ARKA PLAN ANIMASIYASI ---
+function initMatrixBg() {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const alphabet = "01BRAWLSTARS0101💥⭐🏆💎";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+
+    const rainDrops = [];
+    for (let x = 0; x < columns; x++) {
+        rainDrops[x] = 1;
+    }
+
+    function draw() {
+        ctx.fillStyle = 'rgba(5, 5, 10, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#00f3ff'; // Neon Mavi
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                rainDrops[i] = 0;
+            }
+            rainDrops[i]++;
+        }
+    }
+    setInterval(draw, 33);
 }
 
-// --- 2. Təhlükəsizlik və Anti-Bot Giriş Sistemi ---
-function sendOtp() {
+// --- 2. SƏNİN SERVICE ID-N İLƏ REAL GMAIL GÖNDƏRMƏ ---
+function sendRealOtp() {
     const email = document.getElementById('email-input').value;
     if (!email || !email.includes('@') || email.length < 6) {
-        showNotification("❌ Zəhmət olmasa düzgün bir email daxil edin!", "red");
+        alert("Zəhmət olmasa düzgün bir Gmail ünvanı daxil edin!");
         return;
     }
-    
+
+    // 6 rəqəmli kod yaradılır
     generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`%c[Sistem Kodu]: ${generatedOtp}`, "color: #00ffcc; font-weight: bold; font-size: 16px;");
-    
-    alert("Bot yoxlama kodu yaradıldı!\n\nKodu görmək üçün klaviaturada F12 düyməsini sıxın və 'Console' bölməsinə baxın.");
-    
-    document.getElementById('login-part').classList.add('hidden');
-    document.getElementById('otp-part').classList.remove('hidden');
+    console.log(`[Təhlükəsizlik Sistemi] Yaradılan Kod: ${generatedOtp}`);
+
+    const templateParams = {
+        to_email: email,
+        otp_code: generatedOtp
+    };
+
+    // Sənin service_attk09n Xidmətin İnteqrasiyası
+    emailjs.send('service_attk09n', 'YOUR_TEMPLATE_ID', templateParams)
+    .then(function(response) {
+        alert("🔒 Təhlükəsizlik kodu real olaraq Gmailinizə göndərildi! Gələn qutusu və ya Spam bölməsini yoxlayın.");
+        document.getElementById('login-part').classList.add('hidden');
+        document.getElementById('otp-part').classList.remove('hidden');
+    }, function(error) {
+        console.log("EmailJS Xətası:", error);
+        alert("EmailJS ayarları (Public Key və ya Template ID) hələ tam yazılmayıb! Konsol (F12) bölməsindən kodu götürərək test edə bilərsiniz.");
+        // Testin yarımçıq qalmaması üçün keçid təmin edilir
+        document.getElementById('login-part').classList.add('hidden');
+        document.getElementById('otp-part').classList.remove('hidden');
+    });
 }
 
 function checkOtp() {
     const input = document.getElementById('otp-input').value;
     if (input === generatedOtp) {
-        showNotification("✅ Giriş uğurludur!", "green");
+        alert("Giriş təsdiqləndi! Dashboard panelinə yönləndirilirsiniz.");
         document.getElementById('otp-part').classList.add('hidden');
         document.getElementById('portal-part').classList.remove('hidden');
     } else {
-        showNotification("❌ Kod yanlışdır!", "red");
+        alert("Daxil etdiyiniz kod yanlışdır!");
     }
 }
 
-// --- 3. Kupa Klikləmə və XP Sistemi ---
+// --- 3. UI VƏ İNTERFEYS LOGİKASI ---
+function updateUI() {
+    document.getElementById('trophy-count').innerText = trophies;
+    document.getElementById('xp-progress').style.width = xp + "%";
+    
+    let rank = "Bürünc Oyunçu 🥉";
+    if(trophies >= 100) rank = "Epik Döyüşçü 🌟";
+    if(trophies >= 300) rank = "Kiber Elmas Master 💎🔥";
+    document.getElementById('user-title').innerText = "Rank: " + rank;
+}
+
 function addTrophies() {
     trophies += 5;
-    localStorage.setItem('portal_trophies', trophies);
-    gainXP(10);
+    xp += 20;
+    if (xp >= 100) { xp = 0; level++; }
+    saveData();
     updateUI();
 }
 
-function gainXP(amount) {
-    userXP += amount;
-    if (userXP >= 100) {
-        userLevel += 1;
-        userXP = userXP - 100;
-        showNotification(`🎉 Səviyyə Artırıldı: LVL ${userLevel}!`, "gold");
-    }
-    localStorage.setItem('portal_xp', userXP);
-    localStorage.setItem('portal_level', userLevel);
+function openStarrDrop() {
+    const res = document.getElementById('drop-res');
+    res.innerText = "Açılır... 🎲";
+    setTimeout(() => {
+        const rewards = ["⚡ 200 Token Doubler", "🪙 500 Qızıl", "💎 10 Pulsuz Elmas Xalı"];
+        res.innerText = "Çıxdı: " + rewards[Math.floor(Math.random() * rewards.length)];
+        document.getElementById('drop-btn').disabled = true;
+    }, 1200);
 }
 
-// --- 4. Profil Avatar Mexanikası ---
-function changeAvatar(emoji) {
-    document.getElementById('avatar-display').innerText = emoji;
-    showNotification("👤 Profil şəkli yeniləndi", "cyan");
-}
-
-// --- 5. Gündəlik Mükafat Sistemi ---
-function claimDaily() {
-    const dailyBtn = document.getElementById('daily-btn');
-    if (dailyBtn) {
-        trophies += 50;
-        localStorage.setItem('portal_trophies', trophies);
-        updateUI();
-        dailyBtn.disabled = true;
-        dailyBtn.innerText = "Alındı";
-        dailyBtn.style.background = "#444";
-        showNotification("🎁 +50 Kupa Bonus qazandınız!", "gold");
-    }
-}
-
-// --- 6. Qlobal Söhbət Otağı ---
+// --- 4. QLOBAL SÖHBƏT OTAĞI ---
 function setupChat() {
     const screen = document.getElementById('chat-screen');
-    if (screen) {
-        screen.innerHTML = `
-            <p style="margin:4px 0; color:#aaa;"><b>[Sistem]:</b> Portala xoş gəldiniz!</p>
-            <p style="margin:4px 0;"><b>Leon_Pro:</b> Kim kupa qasır? Otaq kodu paylaşın.</p>
-            <p style="margin:4px 0;"><b>Spike_Fan:</b> Bu yeni dizayn çox sürətli işləyir.</p>
-        `;
-        screen.scrollTop = screen.scrollHeight;
-    }
+    screen.innerHTML = "<p style='color:#555;'>[Sistem]: Təhlükəsiz kiber kanal açıldı.</p><p><b>Pro_Brawler:</b> Kim kupa qasır? Otaq kodu yazın.</p>";
 }
 
 function sendMsg() {
     const nick = document.getElementById('chat-nick').value || "Oyunçu";
+    const color = document.getElementById('nick-color').value;
     const text = document.getElementById('chat-text').value;
-    if (!text.trim()) return;
-    
+    if(!text.trim()) return;
+
     const screen = document.getElementById('chat-screen');
-    screen.innerHTML += `<p><b>${nick}:</b> ${text}</p>`;
+    screen.innerHTML += `<p><b style="color:${color}">${nick}:</b> ${text}</p>`;
     document.getElementById('chat-text').value = "";
     screen.scrollTop = screen.scrollHeight;
-    gainXP(5);
 }
 
-// --- 7. Klan Paylaşım Sistemi ---
-function addClub() {
-    const tag = document.getElementById('club-tag').value;
-    if (!tag.trim()) return;
-    
-    const clubList = document.getElementById('club-list');
-    clubList.innerHTML += `<div style="margin:3px 0; color:#00ffcc;">🛡️ Siyahıda: ${tag.toUpperCase()}</div>`;
-    document.getElementById('club-tag').value = "";
-    showNotification("🛡️ Klan uğurla əlavə edildi!", "cyan");
-}
-
-// --- 8. Otaq Kodu Paylaşımı ---
-function shareRoom() {
-    const code = document.getElementById('room-code').value;
-    if (!code.trim()) return;
-    alert(`Otaq kodu [${code.toUpperCase()}] kopyalandı və paylaşıldı!`);
-    document.getElementById('room-code').value = "";
-}
-
-// --- 9. Brawler Axtarış Süzgəci ---
-function filterBrawlers() {
-    const query = document.getElementById('search-brawler').value.toLowerCase();
-    const res = document.getElementById('brawler-res');
-    const list = ["colt", "shelly", "edgar", "mortis", "crow", "leon", "spike"];
-    
-    if (!query) {
-        res.innerText = "Bütün xarakterlər aktivdir";
-        return;
-    }
-    
-    const found = list.filter(item => item.includes(query));
-    if (found.length > 0) {
-        res.innerText = "Tapıldı: " + found.join(", ");
-    } else {
-        res.innerText = "Xarakter tapılmadı...";
-    }
-}
-
-// --- 10. İnternet Ping Testi Simulyatoru ---
-function runPingTest() {
-    const res = document.getElementById('ping-res');
-    if (res) {
-        res.innerText = "Yoxlanır...";
-        setTimeout(() => {
-            const randomPing = Math.floor(20 + Math.random() * 60);
-            res.innerText = `${randomPing} ms (Stabil)`;
-        }, 8000);
-    }
-}
-
-// --- 11. Səs Effekti Pəncərəsi ---
-function playBrawlSound() {
-    showNotification("🔊 Səs effekti aktiv edildi!", "cyan");
-}
-
-// --- 12. Səsvermə Sistemi ---
-function vote(type) {
-    if (type === 'Leon') {
-        let c = parseInt(document.getElementById('v-leon').innerText);
-        document.getElementById('v-leon').innerText = c + 1;
-    } else {
-        let c = parseInt(document.getElementById('v-crow').innerText);
-        document.getElementById('v-crow').innerText = c + 1;
-    }
-    showNotification("📊 Səsiniz qeydə alındı", "green");
-}
-
-// --- 13. Gizli Promo Kod Sahəsi ---
-function activateSecret() {
-    const code = document.getElementById('secret-code').value;
-    if (code.toUpperCase() === "BS2026") {
-        trophies += 100;
-        localStorage.setItem('portal_trophies', trophies);
-        updateUI();
-        showNotification("🌟 Gizli Kod: +100 Kupa!", "gold");
-    } else {
-        showNotification("❌ Keçərsiz Kod", "red");
-    }
-    document.getElementById('secret-code').value = "";
-}
-
-// --- 14. Elmas Sifariş Kalkulyatoru ---
-function buyGems() {
+function processOrder() {
     const pack = document.getElementById('gem-pack').value;
-    showNotification(`🛒 ${pack} Elmas sifarişi siyahıya əlavə edildi!`, "gold");
+    alert(` Sifariş Uğurla Qeydə Alındı!\nSeçilən Paket: ${pack} Elmas\n\nBalans yaxın zamanda rəhbərlik tərəfindən təsdiqlənib yüklənəcək.`);
 }
 
-// --- 15. Bildiriş Pəncərəsi (Toast Notification Layout) ---
-function showNotification(text, color) {
-    const toast = document.createElement("div");
-    toast.style.position = "fixed";
-    toast.style.bottom = "20px";
-    toast.style.right = "20px";
-    toast.style.padding = "12px 25px";
-    toast.style.borderRadius = "8px";
-    toast.style.background = "#141722";
-    toast.style.borderLeft = `5px solid ${color}`;
-    toast.style.color = "#fff";
-    toast.style.boxShadow = "0 5px 15px rgba(0,0,0,0.4)";
-    toast.style.zIndex = "9999";
-    toast.innerText = text;
-    
-    document.body.appendChild(toast);
-    setTimeout(() => { toast.remove(); }, 3500);
+function changeAvatar(emoji) {
+    document.getElementById('avatar-display').innerText = emoji;
 }
 
-// --- Simulyasiya Taymerləri ---
-function startViewersCounter() {
+function startMonitorSim() {
     setInterval(() => {
-        const viewersSpan = document.getElementById('viewers');
-        if (viewersSpan) {
-            viewersSpan.innerText = Math.floor(400 + Math.random() * 45);
-        }
-    }, 5000);
+        const ping = Math.floor(20 + Math.random() * 20);
+        document.getElementById('fps-ping').innerText = ping;
+        
+        const online = Math.floor(500 + Math.random() * 80);
+        document.getElementById('online-count').innerText = online;
+    }, 4000);
 }
 
-function startSeasonTimer() {
-    const timerSpan = document.getElementById('season-timer');
-    if (timerSpan) {
-        let d = 14, h = 5, m = 22;
-        setInterval(() => {
-            m--;
-            if (m < 0) { m = 55; h--; }
-            timerSpan.innerText = `${d}g ${h}s ${m}d`;
-        }, 60000);
-    }
-}
-
-// Məlumatları Sıfırlama Düyməsi (İstəyə bağlı konsoldan işlədilə bilər)
-function resetPortalData() {
-    localStorage.clear();
-    trophies = 0;
-    userXP = 0;
-    userLevel = 1;
-    updateUI();
-    alert("Bütün yerli sayt datası sıfırlandı!");
+function saveData() {
+    localStorage.setItem('cyber_trophies', trophies);
+    localStorage.setItem('cyber_xp', xp);
+    localStorage.setItem('cyber_lvl', level);
 }
